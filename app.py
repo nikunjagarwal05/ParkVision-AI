@@ -48,21 +48,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 @st.cache_resource
-def load_system():
-    import glob
+def load_system(use_weights):
     from ultralytics import YOLO
     
-    # 1. Prioritize a fixed weight file if uploaded to GitHub for teammates
-    if os.path.exists("best_model.pt"):
-        use_weights = "best_model.pt"
-    else:
-        # 2. Fall back to local training runs
-        weight_files = glob.glob("runs/**/best.pt", recursive=True)
-        if weight_files:
-            use_weights = max(weight_files, key=os.path.getctime)
-        else:
-            # 3. Base model
-            use_weights = 'yolov8n.pt'
+    # If the user's selected model doesn't exist, fallback to base
+    if not os.path.exists(use_weights):
+        use_weights = 'yolov8n.pt'
             
     sps = SmartParkingSystem(data_yaml="parking.yaml", model_path=use_weights)
     sps.model = YOLO(use_weights)
@@ -71,15 +62,28 @@ def load_system():
 st.title("🅿️ Smart Parking Space Detection")
 st.markdown("Upload CCTV or parking footage, and the AI will analyze availability in real-time.")
 
-sps = load_system()
-
 with st.sidebar:
     st.header("⚙️ Configuration")
+    
+    # Professor Demonstration Dropdown
+    selected_model = st.selectbox(
+        "🧠 Select Model (Demonstration Mode)", 
+        [
+            "model_100_epochs.pt", 
+            "model_50_epochs.pt", 
+            "model_20_epochs.pt",
+            "best_model.pt"
+        ], 
+        index=0
+    )
+    
     conf_threshold = st.slider("Confidence Threshold", min_value=0.001, max_value=0.900, value=0.002, step=0.001, format="%.3f")
     img_size = st.selectbox("Inference Resolution", [416, 640, 800, 1280, 1920], index=3)
-    
+
     st.markdown("---")
     st.info("💡 **Tip:** Use a birds-eye view camera for optimal model accuracy.")
+
+sps = load_system(selected_model)
 
 video_url = st.text_input("📹 Or stream from CCTV (RTSP / HTTP URL):", placeholder="rtsp://admin:admin@192.168.1.100:554/stream")
 st.text("— OR —")
