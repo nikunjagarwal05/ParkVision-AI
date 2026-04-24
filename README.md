@@ -14,14 +14,40 @@
 
 ## 🌟 Overview
 
-**ParkVision AI** is a production-ready computer vision application designed to monitor CCTV and surveillance feeds to automatically classify parking spaces in real-time. By leveraging a fine-tuned **YOLOv8** model trained on the PKLot dataset, the system accurately distinguishes between empty and occupied spaces, even in highly dense parking lots.
+**ParkVision AI** is a production-ready computer vision application designed to monitor CCTV and surveillance feeds to automatically classify parking spaces in real-time. By leveraging a custom-trained **YOLOv8** model fine-tuned over 100 epochs on the PKLot dataset, the system accurately distinguishes between empty and occupied spaces, even in highly dense parking lots.
 
 ### ✨ Key Features
+- **Interactive Model Demonstration:** A built-in UI dropdown allows users to seamlessly hot-swap between models (20-epoch, 50-epoch, and 100-epoch) in real-time to visualize the AI's learning progression.
 - **Real-Time Video Analytics:** Stream live RTSP/HTTP camera feeds or upload `.mp4` files for instantaneous analysis.
 - **Dynamic Auto-Calibration:** Built-in tensor calibration normalizes raw YOLOv8 probabilities to provide a highly accurate, user-friendly 0-100% confidence slider.
 - **Agnostic Non-Maximum Suppression (NMS):** Smart overlapping box removal ensures that tightly parked cars aren't double-counted with conflicting red/green boxes.
 - **High-Density Capable:** Process massive 4K drone feeds with the ability to detect and track over 1,000 independent parking spaces simultaneously (`max_det=1000`).
-- **Interactive Streamlit GUI:** A sleek, dark-themed dashboard providing live metrics (Total, Available, Occupied).
+
+---
+
+## 📊 Final Model Accuracy (Epoch 100)
+
+After 100 epochs of training on an NVIDIA RTX 3050 (with FP32 math optimization to prevent underflow), the AI achieved State-of-the-Art accuracy:
+- **mAP@0.5:** `87.6%` (0.876)
+- **Precision (P):** `95.3%` (0.953)
+- **Recall (R):** `78.8%` (0.788)
+- **Train Box Loss:** `0.3599`
+
+---
+
+## 📸 System Dashboard & Output
+
+The Streamlit UI provides a live heads-up display overlay on all processed frames, complete with dynamic alerting and real-time metric tracking.
+
+<div align="center">
+  <img src="screenshots/dashboard_1.png" width="80%" alt="ParkVision Live Analytics">
+  <p><i>Live detection feed showing real-time Space Availability and Occupancy metrics.</i></p>
+</div>
+
+<div align="center">
+  <img src="screenshots/dashboard_3.png" width="80%" alt="High Density Detection">
+  <p><i>The system effortlessly processes high-density parking structures with precision bounding boxes.</i></p>
+</div>
 
 ---
 
@@ -29,10 +55,13 @@
 
 ```text
 ParkVision/
-├── app.py                      # Streamlit interactive dashboard & auto-calibration engine
+├── app.py                      # Streamlit dashboard, Model Hot-Swapper, & Calibration engine
 ├── smart_parking_system.py     # Core YOLOv8 OOP Engine (Train/Predict modules)
 ├── parking.yaml                # Dataset configuration matrix
-├── best_model.pt               # Compiled production weights (add this after training)
+├── best_model.pt               # Compiled production weights (Epoch 100)
+├── model_20_epochs.pt          # Demonstration checkpoint weights
+├── model_50_epochs.pt          # Demonstration checkpoint weights
+├── IEEE_Report.tex             # Official scientific project documentation
 ├── requirements.txt            # Environment dependencies
 └── .gitignore                  # Keeps your repo clean from massive datasets
 ```
@@ -43,7 +72,7 @@ ParkVision/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YourUsername/ParkVision-AI.git
+git clone https://github.com/nikunjagarwal05/ParkVision-AI.git
 cd ParkVision-AI
 ```
 
@@ -58,36 +87,9 @@ pip install -r requirements.txt
 ```
 
 ### 3. Launch the Dashboard
-Ensure you have your weights (`best_model.pt`) in the root folder, then boot the system:
+Ensure you have the `.pt` weights in the root folder, then boot the system:
 ```bash
 streamlit run app.py
-```
-
----
-
-## 🧠 Model Training
-
-If you wish to fine-tune the model yourself or adjust for a new camera angle (Domain Shift adaptation), you can utilize the core engine:
-
-```bash
-# Train the model (Optimized for RTX 3000/4000 series via FP32 math)
-python smart_parking_system.py --mode train --epochs 100 --batch 4
-```
-*Note: Mixed Precision (AMP) is disabled by default to prevent FP16 underflow bugs on dense datasets.*
-
----
-
-## 📸 Expected Output
-
-The UI provides a live heads-up display overlay on all processed frames:
-- 🟩 **Green Boxes:** `space-empty`
-- 🟥 **Red Boxes:** `space-occupied`
-
-```text
-┌──────────────────────────────────────────────────┐
-│  Available: 67 / 199         Occupied: 132       │
-│  Free: 33.7%                 Empty: 67           │
-└──────────────────────────────────────────────────┘
 ```
 
 ---
