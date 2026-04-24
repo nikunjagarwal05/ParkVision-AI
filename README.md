@@ -61,7 +61,6 @@ ParkVision/
 ├── best_model.pt               # Compiled production weights (Epoch 100)
 ├── model_20_epochs.pt          # Demonstration checkpoint weights
 ├── model_50_epochs.pt          # Demonstration checkpoint weights
-├── IEEE_Report.tex             # Official scientific project documentation
 ├── requirements.txt            # Environment dependencies
 └── .gitignore                  # Keeps your repo clean from massive datasets
 ```
