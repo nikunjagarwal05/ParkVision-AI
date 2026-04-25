@@ -95,6 +95,3 @@ streamlit run app.py
 
 ## 🤝 Contributing
 Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
-
-## 📝 License
-This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
